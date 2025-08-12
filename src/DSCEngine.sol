@@ -14,7 +14,9 @@ contract DSCEngine is ReentrancyGuard {
 
  mapping(address token => address priceFeed) private s_priceFeeds;
 mapping(address user => mapping(address token => uint256 amount)) private s_collateral;
+mapping(address user => uint256 amountDSCToMint) private s_dscMinted;
 
+address [] private s_collateralToken;
 DecentralizedStableCoin private immutable i_dsc;
 
 event CollateralDeposited(
@@ -65,7 +67,11 @@ event CollateralDeposited(
 
     function redeemCollateralAndBurnDsc() external{}
     function redeemCollateral() external{}
-    function mintDsc() external{}
+    function mintDsc(uint256 amountDSCToMint) external moreThanZero(amountDSCToMint) nonReentrant {
+       s_dscMinted[msg.sender] += amountDSCToMint;
+        // Mint the specified amount of DSC
+        revertIfHealthFactorIsBroken(msg.sender);
+    }
 
     function liquidateCollateral() external{}
 
@@ -73,6 +79,35 @@ event CollateralDeposited(
     function burnDsc() external{}
     function liquidate() external{}
     function getHealthFactor() external view returns (uint256) {
+    
+    //internal Functions
 
+function _getAccountInformation(address user) private view returns (uint256 totalDSCMinted, uint256 collateralInUsd) {
+  totalDSCMinted = s_dscMinted[user];
+  collateralInUsd = getAccountCollateralValue(user);
+  // Logic to calculate the total collateral value in USD
+  return (totalDSCMinted, collateralInUsd);
+}
+
+    function _healthFactor(address user) internal view returns (uint256) {
+    // Logic to calculate the health factor
+    // This is a placeholder for the actual implementation
+    (uint256 totalDSCMinted, uint256 totalCollateralValue) = _getAccountInformation(user);
+    return 1;
+}
+
+    function revertIfHealthFactorIsBroken(address user) internal view {
+        // Logic to check if the health factor is broken
+        // If it is, revert with an appropriate error
+        // This is a placeholder for the actual implementation
+        revert("Health factor is broken");
+    }
+   }
+
+   //public and external view functions
+   functin getAccountCollateral (address user) public view (uint256) {
+   for (uint256 i=0; i<s_collateralToken.length; i++){
+    address token = s_collateralToken[1];
+   }
    }
 }
